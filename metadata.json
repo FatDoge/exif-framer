@@ -1,0 +1,5 @@
+{
+  "name": "ExifFrame",
+  "description": "A minimalist tool to add elegant EXIF data borders to your photography.",
+  "requestFramePermissions": []
+}
