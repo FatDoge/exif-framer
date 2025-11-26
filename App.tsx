@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { UploadZone } from './components/UploadZone';
 import { PreviewCard } from './components/PreviewCard';
 import { Controls } from './components/Controls';
@@ -7,8 +7,10 @@ import { AppState, ExifData, INITIAL_EXIF } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { snapdom } from '@zumer/snapdom';
 import { heicTo, isHeic } from 'heic-to';
+import { I18nProvider, useI18n, Locale } from './i18n';
+import { Github, Globe } from 'lucide-react';
 
-function App() {
+function InnerApp() {
   const [state, setState] = useState<AppState>({
     file: null,
     imageSrc: null,
@@ -19,6 +21,8 @@ function App() {
   });
 
   const [downloading, setDownloading] = useState(false);
+  const { t } = useI18n();
+  
 
   // Handle File Upload
   const handleFileSelect = async (file: File) => {
@@ -83,7 +87,7 @@ function App() {
 
     try {
       const el = document.getElementById('preview-node');
-      if (!el) throw new Error('未找到预览元素');
+      if (!el) throw new Error(t('errors.preview_not_found'));
       const imgProbe = await new Promise<{ w: number; h: number }>((resolve, reject) => {
         const probe = new Image();
         probe.onload = () => resolve({ w: probe.naturalWidth, h: probe.naturalHeight });
@@ -102,8 +106,8 @@ function App() {
         embedFonts: true,
       } as any);
     } catch (e) {
-      console.error("下载失败", e);
-      alert("无法生成图片，请重试。");
+      console.error(t('errors.download_failed'), e);
+      alert(t('errors.download_retry'));
     } finally {
       setDownloading(false);
     }
@@ -112,16 +116,26 @@ function App() {
   return (
     <div className="min-h-screen w-full bg-[#f9fafb] text-gray-900 font-sans selection:bg-gray-900 selection:text-white">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 min-h-screen flex flex-col">
+        <header className="flex justify-between items-center mb-6 md:mb-12">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 bg-gray-900 rounded-sm" />
+            <span className="font-bold text-xl tracking-tight">{t('app.header.brand')}</span>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white/80 backdrop-blur px-2 py-2 shadow-sm">
+            <LangSwitcher />
+            <a
+              href="https://github.com/FatDoge/exif-framer"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+              className="p-2 rounded-lg hover:bg-gray-100"
+            >
+              <Github className="w-4 h-4" />
+            </a>
+          </div>
+        </header>
         
-        {/* Header (only show when uploading) */}
-        {!state.imageSrc && (
-            <header className="flex justify-between items-center mb-12">
-            <div className="flex items-center gap-2">
-                <div className="w-5 h-5 bg-gray-900 rounded-sm" />
-                <span className="font-bold text-xl tracking-tight">ExifFrame</span>
-            </div>
-            </header>
-        )}
+        
 
         <main className="flex-grow flex flex-col justify-center">
             <AnimatePresence mode="wait">
@@ -134,9 +148,9 @@ function App() {
                             exit={{ opacity: 0, scale: 0.98 }}
                             className="flex flex-col items-center justify-center min-h-[50vh]"
                         >
-                            <div className="w-12 h-12 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
-                            <div className="mt-4 text-sm text-gray-700">正在处理照片...</div>
-                            <div className="mt-1 text-xs text-gray-400">解析EXIF与生成预览</div>
+                            <div className="w-12 h-12 border-[3px] border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+                            <div className="mt-4 text-sm text-gray-700">{t('app.processing.title')}</div>
+                            <div className="mt-1 text-xs text-gray-400">{t('app.processing.subtitle')}</div>
                         </motion.div>
                     ) : (
                         <UploadZone key="upload" onFileSelect={handleFileSelect} />
@@ -150,7 +164,7 @@ function App() {
                         className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start h-full"
                     >
                         {/* Left/Top: Preview Area */}
-                        <div className="lg:col-span-8 w-full bg-gray-200/50 rounded-3xl p-6 md:p-12 flex items-center justify-center min-h-[50vh] lg:min_h-[80vh] border border-gray-200/50">
+                        <div className="lg:col-span-8 w-full bg-gray-200/50 rounded-3xl p-6 md:p-12 flex items-center justify-center min-h-[50vh] lg:min-h-[80vh] border border-gray-200/50">
                             <PreviewCard imageSrc={state.imageSrc} exif={state.exif} borderColor={state.borderColor || '#ffffff'} layout={state.layout || 'left'} />
                         </div>
 
@@ -174,10 +188,39 @@ function App() {
         </main>
         
         <footer className="mt-12 text-center text-xs text-gray-400">
-           &copy; {new Date().getFullYear()} ExifFrame. 极简照片工具。
+           &copy; {new Date().getFullYear()} ExifFrame. {t('app.footer')}
         </footer>
       </div>
     </div>
+  );
+}
+
+const LangSwitcher: React.FC = () => {
+  const { locale, setLocale } = useI18n();
+  const next = useMemo<Locale>(() => (locale === 'zh' ? 'en' : 'zh'), [locale]);
+  return (
+    <button
+      type="button"
+      aria-label="Switch language"
+      className="p-2 rounded-lg hover:bg-gray-100 inline-flex items-center gap-1"
+      onClick={() => {
+        setLocale(next);
+        localStorage.setItem('locale', next);
+      }}
+    >
+      <Globe className="w-4 h-4" />
+      <span className="text-xs font-medium">{locale === 'zh' ? '中' : 'EN'}</span>
+    </button>
+  );
+};
+
+function App() {
+  const initialLocale = (localStorage.getItem('locale') as Locale) || 'zh';
+  const [locale, setLocale] = useState<Locale>(initialLocale);
+  return (
+    <I18nProvider locale={locale} setLocale={setLocale}>
+      <InnerApp />
+    </I18nProvider>
   );
 }
 

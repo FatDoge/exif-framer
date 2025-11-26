@@ -19,7 +19,7 @@
 - EXIF 解析：`exifreader`
 - HEIC 转换：`heic-to`
 - DOM 导出：`@zumer/snapdom`
-- 样式：`TailwindCSS`（通过 CDN 引入）
+- 样式：`TailwindCSS v4`（通过 `@tailwindcss/postcss` 插件与 `index.css` 导入）
 
 ## 快速开始
 - 环境要求：已安装 `Node.js`（推荐 `pnpm`）
@@ -48,7 +48,7 @@
 - `utils/exifHelper.ts`：EXIF 读取与格式化（`extractExif`、`formatFocalLength`、`formatFNumber`、`formatISO`、`formatShutter`、`formatDate`）
 - `utils/canvasRenderer.ts`：备用的高分辨率 Canvas 渲染方案（当前主流程使用 DOM 导出）
 - `types.ts`：类型与默认 EXIF（`types.ts:21–30`）
-- `index.html`：基础 HTML、Tailwind 与字体加载
+- `index.html`：基础 HTML 与字体加载
 - `index.tsx`：挂载 React 应用
 - `vite.config.ts`：Vite 配置（`vite.config.ts:8–11` 服务器端口与主机）
 
@@ -60,7 +60,7 @@
   - ISO：`formatISO` 规范为 `ISO xx`（`utils/exifHelper.ts:36–46`）
   - 快门：`formatShutter` 转为带 `s` 的人类可读形式（`utils/exifHelper.ts:48–56`）
 - HEIC 处理：先探测再转换，失败时退回原文件（`App.tsx:27–37`）
-- 预览渲染：根据边框颜色自动切换暗/亮文本色并清理型号冗余（`components/PreviewCard.tsx:35–44`、`63–85`）
+- 预览渲染：根据边框颜色调整文本色并清理型号冗余（`components/PreviewCard.tsx:35–44`、`63–85`）
 - 品牌图标：按 `make` 识别品牌，未匹配则使用通用图标（`components/BrandIcon.tsx:8–181`）
 - 导出成品：基于 `snapdom.download`，自定义文件名、背景色、质量、字体嵌入（`App.tsx:95–103`）
 
@@ -68,14 +68,18 @@
 - 开发服务器：端口 `3000`，主机 `0.0.0.0`（`vite.config.ts:8–11`）
 - 环境变量：`vite.config.ts:14–16` 中定义了 `GEMINI_API_KEY` 的映射，当前代码未实际使用，可忽略或后续移除
 - 路径别名：`@` 指向项目根目录（`vite.config.ts:17–21`）
+- 样式管线：`postcss.config.js` 使用 `@tailwindcss/postcss` 与 `autoprefixer`；`index.css` 通过 `@import "tailwindcss"` 引入预设与工具类
+- 主题说明：当前版本不包含暗黑模式，已移除相关样式与切换逻辑
 
 ## 常见问题
 - 无 EXIF 或字段缺失：使用默认空值 `INITIAL_EXIF`（`types.ts:21–30`），可在右侧面板手工填写
 - 跨域问题：图片源来自本地上传的 `Blob URL`，下载基于 DOM 渲染，通常不会触发外部跨域限制
 - 品牌未识别：将显示通用相机图标（`components/BrandIcon.tsx:165–181`）
+- Tailwind v4 任意值写法：使用方括号，例如 `border-[3px]`、`min-h-[80vh]`
 
 ## 许可证
-- 暂未设置许可证。如需开源分发，请添加合适的 `LICENSE` 并在此处注明
+- 本项目采用 MIT 许可证发布（Copyright (c) 2025 FatDoge）
+- 详情参见根目录 `LICENSE` 文件
 
 ## 致谢
 - 依赖：`exifreader`、`heic-to`、`@zumer/snapdom`、`framer-motion`、`react-color`、`lucide-react`

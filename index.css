@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@layer base {
+  html { font-family: 'Inter', sans-serif; }
+  body { background-color: #f9fafb; }
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #d1d5db; }

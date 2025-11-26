@@ -2,6 +2,7 @@ import React from 'react';
 import { SketchPicker } from 'react-color';
 import { ExifData } from '../types';
 import { Download, RotateCcw, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 type InputGroupProps = {
   label: string;
@@ -55,6 +56,7 @@ export const Controls: React.FC<ControlsProps> = ({
   layout,
   onUpdateLayout,
 }) => {
+  const { t } = useI18n();
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const pickerAreaRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -104,33 +106,33 @@ export const Controls: React.FC<ControlsProps> = ({
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900 tracking-tight flex items-center gap-2">
           <ImageIcon className="w-5 h-5" />
-          编辑
+          {t('controls.title')}
         </h2>
-        <p className="text-sm text-gray-500 mt-1">自定义在边框上显示的元数据。</p>
+        <p className="text-sm text-gray-500 mt-1">{t('controls.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow content-start">
         <div className="col-span-2">
-          <InputGroup label="相机品牌" value={exif.make} onChange={(v) => onUpdate('make', v)} />
+          <InputGroup label={t('controls.make')} value={exif.make} onChange={(v) => onUpdate('make', v)} />
         </div>
         <div className="col-span-2">
-          <InputGroup label="相机型号" value={exif.model} onChange={(v) => onUpdate('model', v)} />
+          <InputGroup label={t('controls.model')} value={exif.model} onChange={(v) => onUpdate('model', v)} />
         </div>
         <div className="col-span-2">
-          <InputGroup label="镜头型号" value={exif.lens} onChange={(v) => onUpdate('lens', v)} />
+          <InputGroup label={t('controls.lens')} value={exif.lens} onChange={(v) => onUpdate('lens', v)} />
         </div>
 
-        <InputGroup label="焦距" type="number" suffix="mm" value={focalInputValue} onChange={(v) => onUpdate('focalLength', v)} />
-        <InputGroup label="光圈" type="number" prefix="f/" step="0.1" value={fNumberInputValue} onChange={(v) => onUpdate('fNumber', v)} />
-        <InputGroup label="快门速度" type="text" suffix="s" value={shutterInputValue} onChange={(v) => onUpdate('exposureTime', v)} />
-        <InputGroup label="ISO" type="number" prefix="ISO" value={isoInputValue} onChange={(v) => onUpdate('iso', v)} />
+        <InputGroup label={t('controls.focalLength')} type="number" suffix="mm" value={focalInputValue} onChange={(v) => onUpdate('focalLength', v)} />
+        <InputGroup label={t('controls.fNumber')} type="number" prefix="f/" step="0.1" value={fNumberInputValue} onChange={(v) => onUpdate('fNumber', v)} />
+        <InputGroup label={t('controls.exposureTime')} type="text" suffix="s" value={shutterInputValue} onChange={(v) => onUpdate('exposureTime', v)} />
+        <InputGroup label={t('controls.iso')} type="number" prefix="ISO" value={isoInputValue} onChange={(v) => onUpdate('iso', v)} />
 
         <div className="col-span-2">
-          <InputGroup label="日期" value={exif.dateTime} onChange={(v) => onUpdate('dateTime', v)} />
+          <InputGroup label={t('controls.dateTime')} value={exif.dateTime} onChange={(v) => onUpdate('dateTime', v)} />
         </div>
 
         <div className="col-span-2 relative" ref={pickerAreaRef}>
-          <label className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 pl-1">边框颜色</label>
+          <label className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 pl-1">{t('controls.borderColor')}</label>
           <div className="mt-2 flex items-center gap-3">
             <button
               type="button"
@@ -165,13 +167,13 @@ export const Controls: React.FC<ControlsProps> = ({
 
         <div className="col-span-2">
           <div className="flex items-center gap-1.5 pl-1">
-            <label className="text-[10px] uppercase tracking-wider font-semibold text-gray-400">布局</label>
+            <label className="text-[10px] uppercase tracking-wider font-semibold text-gray-400">{t('controls.layout')}</label>
           </div>
           <div className="mt-2 inline-flex rounded-lg border border-gray-200 overflow-hidden">
             {([
-              { key: 'left', icon: AlignLeft, aria: '左对齐' },
-              { key: 'center', icon: AlignCenter, aria: '居中对齐' },
-              { key: 'right', icon: AlignRight, aria: '右对齐' },
+              { key: 'left', icon: AlignLeft, aria: t('controls.align.left') },
+              { key: 'center', icon: AlignCenter, aria: t('controls.align.center') },
+              { key: 'right', icon: AlignRight, aria: t('controls.align.right') },
             ] as const).map(({ key, icon: Icon, aria }) => (
               <button
                 key={key}
@@ -198,7 +200,7 @@ export const Controls: React.FC<ControlsProps> = ({
           ) : (
             <Download className="w-5 h-5" />
           )}
-          {isDownloading ? '处理中...' : '下载图片'}
+          {isDownloading ? t('controls.downloading') : t('controls.download')}
         </button>
 
         <button
@@ -206,7 +208,7 @@ export const Controls: React.FC<ControlsProps> = ({
           className="w-full bg-white hover:bg-gray-50 text-gray-600 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 border border-gray-200 transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
-          重新上传照片
+          {t('controls.reset')}
         </button>
       </div>
     </div>
